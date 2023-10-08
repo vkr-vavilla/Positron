@@ -1,12 +1,12 @@
 # Testing Code
-import SimpleFunctions as SF
+import SimpleModelFunctions as SMF
 import numpy as np
 import matplotlib.pyplot as plt
 import Colors
 
-N_RUNS = 20 # The number of sets of initial values.
+N_RUNS = 5 # The number of sets of initial values.
 
-TEST_RUN = SF.init_velocities(N_RUNS)
+TEST_RUN = SMF.init_velocities(N_RUNS)
 TEST_RUN['x_0s'] = np.zeros(N_RUNS)
 TEST_RUN['y_0s'] = np.zeros(N_RUNS)
 TEST_RUN['z_0s'] = np.zeros(N_RUNS)
@@ -24,14 +24,15 @@ fig = plt.figure()
 # ThetaHistogram.hist(np.arctan(np.sqrt(v_x0s**2 + v_y0s**2)/v_z0s), bins = int(N_RUNS**0.5))
 # print(np.arctan(np.sqrt(v_x0s**2 + v_y0s**2)/v_z0s))
 
-E = 1
-B = 1
+E = 24000
+B = .007
 
-N_TIMES = 1001
-paths = SF.ExB_times(E, B, np.linspace(0,1e-6,N_TIMES), TEST_RUN)
+N_TIMES = 10001
+paths = SMF.ExB_times(E, B, SMF.POSITRON_C, SMF.POSITRON_kg, np.linspace(0,1,N_TIMES), TEST_RUN)
 colors = [Colors.numToColor(n) for n in np.linspace(0,1,N_TIMES)]*N_RUNS
 #print(colors)
 path_plot = fig.add_subplot(projection = '3d')
+#path_plot.set_box_aspect((1/np.ptp(paths[0]), 1/np.ptp(paths[1]), 1/np.ptp(paths[2])))
 path_plot.scatter(paths[0],paths[1],paths[2], c=colors)
 
 plt.show()
