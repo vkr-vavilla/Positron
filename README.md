@@ -6,3 +6,5 @@ I will do the same if I'm confused by code anyone else adds.
 #
 Tips:
 To import .py files, you must leave off the ".py" extension. Also, the .py files should be in the same directory to make sure this works.
+#
+I apologize for any horrible stylistic sins I've committed in the name of coding quickly.
