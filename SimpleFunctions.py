@@ -152,7 +152,7 @@ def init_velocities(N):
 
 # First I'm going to use a point source in a magnetic field only:
 
-def E(q_lowxPlate, q_highxPlate, d_plates):
+def getEz(q_lowxPlate, q_highxPlate, d_plates):
     # Ex = f(q_highxPlate - lowxPlate)/d_plates # Recall/derive equation
     Ez = 0.5 * (q_lowxPlate + q_highxPlate)
     return [Ex, 0, Ez]
@@ -177,6 +177,10 @@ def ExB_times(Ex, B, ts, inits):
     v_theta0s = inits['v_theta0s']
     v_phi0s = inits['v_phi0s']
 
+    v_x0s = inits['v_x0s']
+    v_y0s = inits['v_y0s']
+    v_z0s = inits['v_z0s']
+
     x_0s = inits['x_0s']
     y_0s = inits['y_0s']
     z_0s = inits['z_0s']
@@ -184,26 +188,34 @@ def ExB_times(Ex, B, ts, inits):
     As = np.sqrt(v_x0s**2 + (v_y0s + Ex/B)**2) # v0s in the v' = v + (E/B)j frame
     ps = np.arctan(v_x0s/(v_y0s + Ex/B)) # vφ0s in the v' = v + (E/B)j reference frame
 
-    # initializing return variable to be filled in following for loop
-    xs_ts = []
-    ys_ts = []
-    zs_ts = []
+    num_ts = len(ts)
+    num_runs = len(v_x0s) # I could have used any variable rather than v_x0s
 
+    # initializing return variable to be filled in following for loop
+    xs_ts = np.empty((num_ts, num_runs))
+    ys_ts = np.empty((num_ts, num_runs))
+    zs_ts = np.empty((num_ts, num_runs))
+
+    i = 0 # I want both the index and the value of t for the following loop,
+          # and incrementing the index myself is faster than getting the value of t myself every loop
+          # IF Python is smart about travesing linked lists for for loops.
     for t in ts:
         xs_t = As*np.sin(omega*t - ps)           + As*np.sin(ps) + x_0s
-        ys_t = As*np.cos(omega*t - ps) - (E/B)*t - As*np.cos(ps) + y_0s
-        zs_t =                           v_z0s*t # Edit to include Ek component.
+        ys_t = As*np.cos(omega*t - ps) - (Ex/B)*t - As*np.cos(ps) + y_0s
+        zs_t =                           v_z0s*t # Edit to include Ek component for ExBparE.
 
-        # Here, I am making lists, where each element is a numpy array of x, y, or z coordinates at a particular time.
-        # This means all the points at a particular timee are stored together in memory (like rows),
-        # while particular runs are like columns, except that their actually linked lists.
-        xs_ts += [xs_t]
-        ys_ts += [ys_t]
-        zs_ts += [zs_t]
+        # Here, I am making ndarrays, where each row is a numpy array of x, y, or z coordinates at a particular time.
+        # This means all the points at a particular timee are stored together in memory (rows), while particular runs are columns.
+        xs_ts[i] = xs_t
+        ys_ts[i] = ys_t
+        zs_ts[i] = zs_t
 
-        # I now want rows to be whole runs, with columns being times, i.e., whole runs are blocks in memory.
-        # This actually means I should probably make these proper 2D numpy arrays.
-        # I haven't done this yet.
+        i += 1
+
+    # I now want rows to be whole runs, with columns being times, i.e., whole runs are blocks in memory.
+    xs_ts = np.transpose(xs_ts)
+    ys_ts = np.transpose(ys_ts)
+    zs_ts = np.transpose(zs_ts)
 
     return [xs_ts, ys_ts, zs_ts]
 
@@ -218,56 +230,3 @@ def ExB_end(E, B, L, x_0s, y_0s, z_0s, v_x0s, v_y0s, v_z0s):
 
 def total_path_times():
     pass
-
-# Testing Code
-import matplotlib.pyplot as plt
-#Matplotlib has a whole system of colormaps for doing this, but I didn't want to use it right now.
-def numToColor(num):
-    # Here I map numbers from 0 to 1 (inclusive) to colors from red to yellow to green to cyan to blue to purple.
-    # This is for Matplotlib, so R,G, and B values are each represented as floating point numbers between 0 and 1,
-    # rather than as integers (or bytes) from 0 to 255, as I'm more used to.
-    if num < 0 or num > 1:
-        print("numToColor only works with numbers between 0 and 1 (inclusive).")
-        # I should probably make this an error.
-    elif num < .2:
-        return (1, 5*num, 0)
-    elif num < .4:
-        return (1-5*(num-.2), 1, 0)
-    elif num < .6:
-        return (0, 1, 5*(num-.4))
-    elif num < .8:
-        return (0, 1-5*(num-.6), 1)
-    else:
-        return (5*(num-.8), 0, 1)
-
-N_RUNS = 20 # The number of sets of initial values.
-
-TEST_RUN = init_velocities(N_RUNS)
-TEST_RUN['x_0s'] = np.zeros(N_RUNS)
-TEST_RUN['y_0s'] = np.zeros(N_RUNS)
-TEST_RUN['z_0s'] = np.zeros(N_RUNS)
-
-[v_x0s, v_y0s, v_z0s] = [TEST_RUN['v_x0s'],
-                         TEST_RUN['v_y0s'],
-                         TEST_RUN['v_z0s']]
-
-fig = plt.figure()
-
-# v_0sSpherePlot = fig.add_subplot(projection = '3d')
-# v_0sSpherePlot.scatter(v_x0s, v_y0s, v_z0s)
-
-# ThetaHistogram = fig.add_subplot()
-# ThetaHistogram.hist(np.arctan(np.sqrt(v_x0s**2 + v_y0s**2)/v_z0s), bins = int(N_RUNS**0.5))
-# print(np.arctan(np.sqrt(v_x0s**2 + v_y0s**2)/v_z0s))
-
-E = 1
-B = 1
-
-N_TIMES = 1001
-paths = ExB_times(E, B, np.linspace(0,1e-6,N_TIMES), TEST_RUN)
-colors = [numToColor(n) for n in np.linspace(0,1,N_TIMES)]*N_RUNS
-#print(colors)
-path_plot = fig.add_subplot(projection = '3d')
-path_plot.scatter(paths[0],paths[1],paths[2], c=colors)
-
-plt.show()
