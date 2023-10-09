@@ -6,10 +6,7 @@ import Colors
 
 N_RUNS = 5 # The number of sets of initial values.
 
-TEST_RUN = SMF.init_velocities(N_RUNS)
-TEST_RUN['x_0s'] = np.zeros(N_RUNS)
-TEST_RUN['y_0s'] = np.zeros(N_RUNS)
-TEST_RUN['z_0s'] = np.zeros(N_RUNS)
+TEST_RUN = SMF.point_source(N_RUNS)
 
 [v_x0s, v_y0s, v_z0s] = [TEST_RUN['v_x0s'],
                          TEST_RUN['v_y0s'],
