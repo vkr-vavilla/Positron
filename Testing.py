@@ -24,7 +24,7 @@ fig = plt.figure()
 E = 24000
 B = .007
 
-N_TIMES = 10001
+N_TIMES = 1001
 paths = SMF.ExB_times(E, B, SMF.POSITRON_C, SMF.POSITRON_kg, np.linspace(0,1,N_TIMES), TEST_RUN)
 colors = [Colors.numToColor(n) for n in np.linspace(0,1,N_TIMES)]*N_RUNS
 #print(colors)

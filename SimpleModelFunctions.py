@@ -35,18 +35,19 @@ R_DISK = 0.005
 #   KE_pos in (0, 3eV] : ?uniform distribution (I would expect a log-normal distribution.)
 #   v = sqrt(2*KE_pos/m_e) ; (classical - no S. Relativity)
 
-def getAngle(x, y):
+def getAngle(x, y): # I'm making this only work with iterables now.
     # This is just a basic math function, since arctan doesn't map to the whole circle of 2D directions.
     # The returned angle is 0 if pointing in the positive x direction +π/2 if pointing in the positive y direction, etc.
     # For ease of coding, it currently returns an angle in the interval [-π/2, +3π/4)
-    if x > 0:
-        return np.arctan(y/x):
-    elif x < 0: # if would do, because of the return statements. I just use elif, which means "else if", for clarity
-        return np.pi + np.arctan(y/x)
-    elif y > 0:
-        return  .5*np.pi
-    elif y < 0:
-        return -.5*np.pi
+    for i in range(len(x)):
+        if x[i] > 0:
+            return np.arctan(y[i]/x[i])
+        elif x[i] < 0: # if would do, because of the return statements. I just use elif, which means "else if", for clarity
+            return np.pi + np.arctan(y[i]/x[i])
+        elif y[i] > 0:
+            return  .5*np.pi
+        elif y[i] < 0:
+            return -.5*np.pi
 
 def hemispherically_uniform_velocities(N, v_0s):
 
@@ -232,26 +233,26 @@ def Ez_only_mid_dipole_end(Ez, charge, mass, L, inits):
 
     t_finals = np.sqrt(2*L/v_z0) # ?speed
     
-    xs = 
-    ys = 
-    zs = 
+    # xs = 
+    # ys = 
+    # zs = 
 
-    v_xs = 
-    v_ys =
-    v_zs =
+    # v_xs = 
+    # v_ys =
+    # v_zs =
 
-    vs = np.sqrt(v_xs**2 + v_ys**2 + v_zs**2)
-    v_rs = np.sqrt(v_xs**2 + v_ys**2)
-    v_thetas = getAngle(v_zs, v_rs)
-    v_phis = getAngle(v_xs, v_ys)
+    # vs = np.sqrt(v_xs**2 + v_ys**2 + v_zs**2)
+    # v_rs = np.sqrt(v_xs**2 + v_ys**2)
+    # v_thetas = getAngle(v_zs, v_rs)
+    # v_phis = getAngle(v_xs, v_ys)
 
-    return {'v_0s' : vs,
-            'v_theta0s' : v_thetas,
-            'v_phi0s' : v_phis,
-            'v_z0s' : v_zs,
-            'v_r0s' : v_rs,
-            'v_x0s' : v_xs,
-            'v_y0s' : v_ys}
+    # return {'v_0s' : vs,
+    #         'v_theta0s' : v_thetas,
+    #         'v_phi0s' : v_phis,
+    #         'v_z0s' : v_zs,
+    #         'v_r0s' : v_rs,
+    #         'v_x0s' : v_xs,
+    #         'v_y0s' : v_ys}
 
 def ExB_end(Ex, B, charge, mass, L, inits):
     # Returns dictionary of numpy arrays giving the ending positions and velocities of particles after passing through a distance L of given Ex and B,
