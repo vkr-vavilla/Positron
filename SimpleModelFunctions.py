@@ -96,8 +96,9 @@ def hemispherically_uniform_velocities(N, v_0s):
 # First I'm going to use a point source in a magnetic field only:
 
 def point_source(N_particles):
-    KE_0s = np.random.uniform(low = 0.0, high = 3*eV_J, size = N_particles)
+    KE_0s = np.random.uniform(low = 0.0, high = 2.9*eV_J, size = N_particles)
     # this distribution needs to be fixed
+    # Also, This is actually like moderate with tungsten
     
     v_0s = np.sqrt(2*KE_0s/ELECTRON_kg) # magnitude of velocity
 
@@ -110,7 +111,8 @@ def point_source(N_particles):
 
 def moderate_with_tungsten(entering_states):
     # This is supposed to model particles being moderated with a thin tungsten sheet, but I really don't know how that works so I'm making stuff up.
-    KEs = 2.9*eV_J
+    # This is not how this works. Don't use this function.
+    KE_0s = np.random.uniform(low = 0.0, high = 2.9*eV_J, size = N_particles)
     v_0s = np.sqrt(2*KE_0s/ELECTRON_kg) # magnitude of velocity
     exiting_states = hemispherically_uniform_velocities(N, v_0s)
     exiting_states['x_0s'] = entering_states['x_0s']
@@ -160,9 +162,9 @@ def ExB_times(Ex, B, charge, mass, ts, inits):
           # and incrementing the index myself is faster than getting the value of t myself every loop
           # IF Python is smart about travesing linked lists for for loops.
     for t in ts:
-        xs_t = As*np.sin(omega*t - ps)           + As*np.sin(ps) + x_0s
-        ys_t = As*np.cos(omega*t - ps) - (Ex/B)*t - As*np.cos(ps) + y_0s
-        zs_t =                           v_z0s*t # Edit to include Ek component for ExBparE.
+        xs_t = (As/omega)*np.sin(omega*t - ps)            + (As/omega)*np.sin(ps) + x_0s
+        ys_t = (As/omega)*np.cos(omega*t - ps) - (Ex/B)*t - (As/omega)*np.cos(ps) + y_0s
+        zs_t =                                    v_z0s*t # Edit to include Ek component for ExBparE.
 
         # Here, I am making ndarrays, where each row is a numpy array of x, y, or z coordinates at a particular time.
         # This means all the points at a particular timee are stored together in memory (rows), while particular runs are columns.
@@ -282,8 +284,8 @@ def ExB_end(Ex, B, charge, mass, L, inits):
     t_finals = L/v_z0
 
     # I see now that the fact that I've been using 0s this whole time is a bit unfortunate, but has some uses.
-    xs = As*np.sin(omega*t_finals - ps)                   + As*np.sin(ps) + x_0s
-    ys = As*np.cos(omega*t_finals - ps) - (Ex/B)*t_finals - As*np.cos(ps) + y_0s
+    xs = (As/omega)*np.sin(omega*t_finals - ps)                   + (As/omega)*np.sin(ps) + x_0s
+    ys = (As/omega)*np.cos(omega*t_finals - ps) - (Ex/B)*t_finals - (As/omega)*np.cos(ps) + y_0s
     zs = np.array(L*len(x_0s))
 
     v_xs =  As*cos(omega*t_finals - ps)
