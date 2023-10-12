@@ -121,11 +121,8 @@ def moderate_with_tungsten(entering_states):
 
     return exiting_states
 
-def getE(q_lowxPlate, q_highxPlate, d_plates): # I don't actually use this.
-    # calculates Ez in a region between to 
-    # Ex = f(q_highxPlate - lowxPlate)/d_plates # Recall/derive equation
-    Ez = 0.5 * (q_lowxPlate + q_highxPlate)
-    return [Ex, 0, Ez]
+def getEx(V_west_V, V_east_V, d_plates_m):
+    return = (V_west_V - V_east_V)/d_plates_m
 
 def ExB_times(Ex, B, charge, mass, ts, inits):
     # Returns position at each time t for each initial position and velocity
