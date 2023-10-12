@@ -258,13 +258,14 @@ ExB_D_xDISTANCE_m = inch_m
 # Entering ExB A
 # Entering ExB 
 
-def positron_ExB_A_B(potentials, N):
-    # N_RUNS is the number of sets of initial values.
-    # We're currently treating v_z as constant for now (all plates have equal net charge.)
-
+def random_positrons(N):
     initial_positions = initiate_positron_positions(First_Tube_Radius_m, N)
     initial_states = moderate_with_tungsten(initial_positions, N)
     initial_states = not_hitting_tube(initial_states, First_Tube_Radius_m, N)
+
+def positron_ExB_A_B(potentials, N):
+    # N_RUNS is the number of sets of initial values.
+    # We're currently treating v_z as constant for now (all plates have equal net charge.)
 
     # Reminder: Using ExB_end(Ex, B, charge, mass, L, inits)
 
@@ -278,19 +279,27 @@ def positron_ExB_A_B(potentials, N):
 
     V_avg_B_V = potentials['V_avg_B_V']
 
-    states_enteringExB_B =     z_accelerate(initial_states, V_avg_A_V - V_m_V, POSITRON_C, POSITRON_kg)
+    states_enteringExB_B =     z_accelerate(states_leavingExB_A, V_avg_B_V - V_avg_A_V, POSITRON_C, POSITRON_kg)
     states_leavingExB_B =      ExB_end(Ex_B_V_per_m, B2_T, POSITRON_C, POSITRON_kg, ExB_B_zLENGTH_m, states_enteringExB_B)
 
     return states_leavingExB_B
 
-def positron_ExB_C_D(states_enteringExB_C, potentials, N):
+def positron_ExB_C_D(states_leavingExB_B, potentials, N):
     
     V_avg_B_V = potentials['V_avg_B_V']
-    states_leavingExB_C =      ExB_end(Ex_C_V_per_m, B3_T, POSITRON_C, POSITRON_kg, ExB_B_zLENGTH_m, states_enteringExB_B)
+    V_avg_C_V = potentials['V_avg_C_V']
+    states_enteringExB_C =     z_accelerate(states_leavingExB_B, V_avg_C_V - V_avg_B_V, POSITRON_C, POSITRON_kg)
+    states_leavingExB_C =      ExB_end(Ex_C_V_per_m, B3_T, POSITRON_C, POSITRON_kg, ExB_B_zLENGTH_m, states_enteringExB_C)
 
-    V_avg_C_V = potentials[]
-    states_enteringExB_B =     ExB_end(0,            B2_T, POSITRON_C, POSITRON_kg, ExB_A_TO_ExB_B_m, states_leavingExB_A)
-    states_leavingExB_B =      ExB_end(Ex_B_V_per_m, B2_T, POSITRON_C, POSITRON_kg, ExB_B_zLENGTH_m, states_enteringExB_B)
+    V_avg_D_V = potentials['V_avg_D_V']
+    states_enteringExB_D =     z_accelerate(states_leavingExB_B, V_avg_D_V - V_avg_C_V, POSITRON_C, POSITRON_kg)
+    states_leavingExB_D =      ExB_end(Ex_B_V_per_m, B2_T, POSITRON_C, POSITRON_kg, ExB_B_zLENGTH_m, states_enteringExB_B)
+
+# I can get around not knowing how to model the magnetic bottle
+# with the fact that the electron distribution will be different
+# for different samples anyway.
+
+def electron_ExB_D(states_leaving_TOF_tube, potentials, N):
 
 
 
